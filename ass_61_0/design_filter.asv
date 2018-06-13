@@ -5,8 +5,8 @@ function design_filter(Fc,Fs,N,window)
 % window: type of window end 
 
 Wc = 2*(Fc/Fs);
-M = (N-1)/2;
-for i = 0:(N-1)
+M = (N/2);
+for i = 1:N
     num(1,i+1) = Wc*sinc(Wc*(i-(M)));
 end
 dem = [1];
