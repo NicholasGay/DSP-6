@@ -1,4 +1,4 @@
-function design_filter(Fc,Fs,N,window) 
+function [num,dem] = design_filter(Fc,Fs,N,window) 
 % Fc: cut-off frequency 
 % Fs: sampling frequency 
 % N: no. of taps of filter 
@@ -7,21 +7,21 @@ function design_filter(Fc,Fs,N,window)
  M = (N-1)/2;
 if window == "Rectangular"
     for i = 0:N-1
-        num(1,i+1) = 1;
+        num(1,i+1) = Wc*sinc(Wc*(i-(M)))*1;
     end
     dem = 1;    
 end
 
 if window == "Hamming"
     for i = 0:N-1
-        num(1,i+1) = 0.54+0.46*cos(((i-M)*pi)/M);
+        num(1,i+1) = Wc*sinc(Wc*(i-(M)))*(0.54+0.46*cos(((i-M)*pi)/M));
     end
     dem = 1;    
 end
 
 if window == "Hanning"
     for i = 0:N-1
-        num(1,i+1) = 0.5+0.5*cos(((i-M)*pi)/M);
+        num(1,i+1) = Wc*sinc(Wc*(i-(M)))*(0.5+0.5*cos(((i-M)*pi)/M));
     end
     dem = 1;    
 end
@@ -29,9 +29,9 @@ end
 if window == "Bartlett"
     for i = 0:N-1
        if(i<=M)
-           num(1,i+1) = (2*i)/(N-1);
+           num(1,i+1) = Wc*sinc(Wc*(i-(M)))*((2*i)/(N-1));
        else
-           num(1,i+1) = 2-((2*i)/(N-1));
+           num(1,i+1) = Wc*sinc(Wc*(i-(M)))*(2-((2*i)/(N-1)));
        end
     end
     dem = 1;    
@@ -43,19 +43,15 @@ if window == "Tukey"
         x = alpha(1,i);
         if (0<=x)&&(x<r/2)
             y = ((2*pi)/r)*(x-r/2);
-            num(1,i) = 0.5*(1+cos(y));
+            num(1,i) = Wc*sinc(Wc*(i-(M)))*(0.5*(1+cos(y)));
         elseif (r/2<=x)&&(x<(1-r/2))
-            num(1,i) = 1;
+            num(1,i) = Wc*sinc(Wc*(i-(M)))*1;
         else
             y = ((2*pi)/r)*(x-1+r/2);
-            num(1,i) = 0.5*(1+cos(y));
+            num(1,i) = Wc*sinc(Wc*(i-(M)))*(0.5*(1+cos(y)));
         end
     end
             
     dem = 1;  
 end
-fvtool(num,dem,'magnitude');
-fvtool(num,dem,'phase');
-fvtool(num,dem,'polezero');
-fvtool(num,dem,'impulse');
 end
